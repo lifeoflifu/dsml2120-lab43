@@ -168,27 +168,33 @@ if largest_stage:
 
 with st.container(border=True):
     st.subheader("Q1 · Where is the largest percentage drop-off?")
-    chart, highlight = st.columns([3, 1])
-    with chart:
-        fig = horizontal_bars(
-            STAGES.values(),
-            totals,
-            [f"{value:,}" for value in totals],
-            [CORAL if stage == largest_stage else VIOLET for stage in STAGES],
-            [
-                f"{STAGES[stage]}<br>{totals[stage]:,} reached this stage"
-                + (f"<br>{loss[stage]:.1%} drop from previous stage" if pd.notna(loss[stage]) else "")
-                for stage in STAGES
-            ],
-            "Count reaching each stage",
-            268,
-        )
-        fig.update_xaxes(tickformat="~s")
-        st.plotly_chart(fig, theme=None, config={"displayModeBar": False})
-    with highlight.container(key="funnel_highlight"):
-        if largest_stage:
+    if largest_stage:
+        highlight, takeaway = st.columns([1, 3], vertical_alignment="center")
+        with highlight.container(key="funnel_highlight"):
             st.metric("Largest drop", f"{loss[largest_stage]:.1%}")
-            st.write(transition)
+        with takeaway:
+            st.markdown(f"**{transition}**")
+            if largest_stage == "add_to_cart":
+                st.write(
+                    "Walk through the product page as a shopper. "
+                    "Is the layout clean, and is the Add to Cart button easy to find and use?"
+                )
+
+    fig = horizontal_bars(
+        STAGES.values(),
+        totals,
+        [f"{value:,}" for value in totals],
+        [CORAL if stage == largest_stage else VIOLET for stage in STAGES],
+        [
+            f"{STAGES[stage]}<br>{totals[stage]:,} reached this stage"
+            + (f"<br>{loss[stage]:.1%} drop from previous stage" if pd.notna(loss[stage]) else "")
+            for stage in STAGES
+        ],
+        "Count reaching each stage",
+        268,
+    )
+    fig.update_xaxes(tickformat="~s")
+    st.plotly_chart(fig, theme=None, config={"displayModeBar": False})
     st.caption("Each bar shows how many reached a stage. Hover to see the drop-off from the previous stage.")
 
 source_rates = conversion_by(filtered, "traffic_source")
@@ -224,8 +230,3 @@ with st.container(border=True):
         st.markdown(f"**Q3.** **{device_rates.index[0]}** converted at **{device_rates.iloc[0]['conversion']:.2%}**. Select all devices to compare.")
     else:
         st.markdown("**Q3.** There are no device conversion rates for this selection.")
-    if largest_stage == "add_to_cart":
-        st.markdown(
-            "**What to check next.** Walk through the product page as a shopper. "
-            "Is the layout clean, and is the Add to Cart button easy to find and use?"
-        )
