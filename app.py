@@ -224,3 +224,8 @@ with st.container(border=True):
         st.markdown(f"**Q3.** **{device_rates.index[0]}** converted at **{device_rates.iloc[0]['conversion']:.2%}**. Select all devices to compare.")
     else:
         st.markdown("**Q3.** There are no device conversion rates for this selection.")
+    if largest_stage == "add_to_cart":
+        st.markdown(
+            "**What to check next.** Walk through the product page as a shopper. "
+            "Is the layout clean, and is the Add to Cart button easy to find and use?"
+        )
